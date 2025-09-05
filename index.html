@@ -1496,72 +1496,90 @@
         
     </script>
    <script>
-    // ==================== GESTION PWA ====================
+    // ==================== GESTION PWA AMÉLIORÉE ====================
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
+    
+    // Vérifier si l'application peut être installée
+    function checkPWAInstallable() {
+      // Vérifier si l'application est déjà installée
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App est déjà installée');
+        if (installButton) installButton.style.display = 'none';
+        return;
+      }
+      
+      // Vérifier si le navigateur supporte l'installation PWA
+      if (!deferredPrompt && installButton) {
+        installButton.style.display = 'none';
+      }
+    }
     
     // Enregistrement du Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
+        // Utiliser le chemin relatif correct pour Netlify
+        navigator.serviceWorker.register('sw.js')
           .then(function(registration) {
-            console.log('SW registered: ', registration);
+            console.log('SW enregistré avec succès: ', registration.scope);
           })
           .catch(function(error) {
-            console.log('SW registration failed: ', error);
+            console.log('Échec de l\'enregistrement du SW: ', error);
           });
       });
     }
     
     // Gestion de l'événement beforeinstallprompt
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('beforeinstallprompt event fired');
-      // Empêcher le mini-infobar d'apparaître sur mobile
+      console.log('Événement beforeinstallprompt déclenché');
+      // Empêcher l'affichage automatique de la bannière d'installation
       e.preventDefault();
-      // Stocker l'événement pour qu'il puisse être déclenché plus tard
+      // Stocker l'événement pour une utilisation ultérieure
       deferredPrompt = e;
-      // Montrer le bouton d'installation
+      // Afficher le bouton d'installation
       if (installButton) {
         installButton.style.display = 'block';
+        installButton.addEventListener('click', installApp);
       }
-      
-      installButton.addEventListener('click', (e) => {
-        // Masquer notre bouton d'installation
-        installButton.style.display = 'none';
-        // Montrer l'invite d'installation
-        deferredPrompt.prompt();
-        // Attendre que l'utilisateur réponde à l'invite
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
-          deferredPrompt = null;
-        });
-      });
     });
     
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('App was successfully installed');
-      if (installButton) {
-        installButton.style.display = 'none';
+    // Fonction pour installer l'application
+    function installApp() {
+      if (!deferredPrompt) {
+        alert("Votre navigateur ne supporte pas l'installation d'applications.");
+        return;
       }
+      
+      // Afficher la prompt d'installation
+      deferredPrompt.prompt();
+      
+      // Attendre la réponse de l'utilisateur
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('Utilisateur a accepté l\'installation');
+        } else {
+          console.log('Utilisateur a refusé l\'installation');
+        }
+        // Réinitialiser la variable
+        deferredPrompt = null;
+        // Masquer le bouton
+        if (installButton) installButton.style.display = 'none';
+      });
+    }
+    
+    // Vérifier si l'application est déjà installée
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('Application installée avec succès');
+      if (installButton) installButton.style.display = 'none';
       deferredPrompt = null;
     });
     
-    // Vérifier si l'application est déjà installée
-    window.addEventListener('load', () => {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('App is already installed');
-        if (installButton) {
-          installButton.style.display = 'none';
-        }
-      }
-    });
-</script>
+    // Vérification initiale
+    document.addEventListener('DOMContentLoaded', checkPWAInstallable);
+    </script>
 </body>
 </html>
+
 
 
 
