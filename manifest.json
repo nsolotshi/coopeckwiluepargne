@@ -1,33 +1,23 @@
 {
   "name": "Coopec Kwilu - Gestion Épargne",
   "short_name": "Coopec Kwilu",
-  "description": "Système de gestion des dépôts, retraits et commandes pour la Coopec Kwilu",
+  "description": "Système de gestion des dépôts, retraits et commandes",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#2c3e50",
-  "theme_color": "#3498db",
-  "orientation": "portrait-primary",
+  "theme_color": "#2c3e50",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "type": "image/jpeg"
     },
     {
       "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
-      "sizes": "144x144",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "type": "image/jpeg"
     }
   ],
-  "categories": ["finance", "business", "productivity"],
-  "lang": "fr",
-  "scope": "/"
+  "categories": ["business", "finance", "productivity"]
 }
