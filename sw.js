@@ -1,7 +1,4 @@
-// Version du cache
-const CACHE_NAME = 'coopec-kwilu-v1.0';
-
-// Fichiers à mettre en cache
+const CACHE_NAME = 'coopec-kwilu-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -13,47 +10,39 @@ const urlsToCache = [
 // Installation du Service Worker
 self.addEventListener('install', function(event) {
   console.log('Service Worker: Installation en cours');
-  
-  // Attendre que le cache soit rempli avant de terminer l'installation
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
         console.log('Service Worker: Cache ouvert');
         return cache.addAll(urlsToCache);
       })
-      .then(function() {
-        console.log('Service Worker: Toutes les ressources ont été mises en cache');
-        return self.skipWaiting();
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
 // Activation du Service Worker
 self.addEventListener('activate', function(event) {
   console.log('Service Worker: Activation en cours');
-  
-  // Supprimer les anciens caches
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
           if (cacheName !== CACHE_NAME) {
-            console.log('Service Worker: Suppression de l\'ancien cache', cacheName);
+            console.log('Service Worker: Suppression ancien cache', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
-  
   return self.clients.claim();
 });
 
 // Interception des requêtes
 self.addEventListener('fetch', function(event) {
-  // Ignorer les requêtes non-GET et les requêtes vers l'API Google Apps Script
-  if (event.request.method !== 'GET' || event.request.url.includes('script.google.com')) {
-    return;
+  // Ne pas mettre en cache les requêtes vers Google Apps Script
+  if (event.request.url.includes('script.google.com')) {
+    return fetch(event.request);
   }
   
   event.respondWith(
@@ -69,9 +58,9 @@ self.addEventListener('fetch', function(event) {
                 return fetchResponse;
               });
           })
-          .catch(function() {
-            // En cas d'échec, on peut retourner une page offline personnalisée
-            // Pour l'instant, on laisse simplement échouer la requête
+          .catch(function(error) {
+            console.log('Fetch failed; returning offline page instead.', error);
+            // Vous pourriez retourner une page offline personnalisée ici
           });
       })
   );
