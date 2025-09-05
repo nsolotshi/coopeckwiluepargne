@@ -353,6 +353,24 @@
             max-width: 400px;
             text-align: center;
         }
+
+        /* Styles pour le bouton d'installation */
+        #installButton {
+            margin: 10px auto;
+            display: none;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #installButton:hover {
+            background-color: #219a52;
+        }
     </style>
 </head>
 <body>
@@ -743,11 +761,11 @@
         <div class="container">
             <p>Coopec Kwilu &copy; 2023 - Tous droits réservés</p>
             <p>Système de Gestion d'Épargne</p>
+            <!-- Bouton d'installation PWA -->
+            <button id="installButton" class="btn btn-success">
+                <i class="fas fa-download"></i> Installer l'application
+            </button>
         </div>
-        <!-- Dans votre footer ou ailleurs dans l'interface -->
-        <button id="installButton" style="display: none;" class="btn btn-success" onclick="installApp()">
-        <i class="fas fa-download"></i> Installer l'application
-        </button>
     </footer>
 
     <script>
@@ -1461,9 +1479,6 @@
         });
         }
 
-// Ajouter un élément de menu pour demander l'accès correctif
-// Ajoutez ceci dans votre menu principal ou dans un menu contextuel
-        
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             // Définir la date du jour comme valeur par défaut pour les champs de date
@@ -1481,46 +1496,71 @@
         
     </script>
     <script>
-    // Enregistrement du Service Worker pour PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js')
-            .then(function(registration) {
-            console.log('ServiceWorker enregistré avec succès: ', registration.scope);
-            })
-            .catch(function(error) {
-            console.log("Échec de l'enregistrement du ServiceWorker: ", error);
-            });
-        });
-    }
-
-    // Détection de l'événement d'installation
+    // Gestion de l'installation PWA
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
 
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event déclenché');
+        // Empêcher le mini-infobar d'apparaître sur mobile
         e.preventDefault();
+        // Stocker l'événement pour qu'il puisse être déclenché plus tard
         deferredPrompt = e;
+        // Afficher le bouton d'installation
         installButton.style.display = 'block';
-    });
-
-    function installApp() {
-        if (deferredPrompt) {
+        
+        installButton.addEventListener('click', (e) => {
+            // Masquer notre bouton d'installation
+            installButton.style.display = 'none';
+            // Montrer l'invite d'installation
             deferredPrompt.prompt();
+            // Attendre que l'utilisateur réponde à l'invite
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
-                    console.log('Utilisateur a accepté l\'installation');
+                    console.log('L\'utilisateur a accepté l\'installation');
+                } else {
+                    console.log('L\'utilisateur a refusé l\'installation');
                 }
                 deferredPrompt = null;
-                installButton.style.display = 'none';
             });
-        }
-    }
+        });
+    });
 
     window.addEventListener('appinstalled', (evt) => {
-        console.log('Application installée avec succès');
+        console.log('L\'application a été installée avec succès');
         installButton.style.display = 'none';
+        deferredPrompt = null;
     });
+
+    // Vérifier si l'application est déjà installée
+    window.addEventListener('load', () => {
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('L\'application est déjà installée');
+            installButton.style.display = 'none';
+        }
+    });
+
+    // Enregistrement du Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            // Essayez d'enregistrer le service worker depuis la racine du site
+            navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+                console.log('ServiceWorker enregistré avec succès: ', registration.scope);
+            })
+            .catch(function(error) {
+                console.log("Échec de l'enregistrement du ServiceWorker: ", error);
+                // Essayez d'enregistrer depuis le répertoire courant
+                navigator.serviceWorker.register('sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker enregistré avec succès (chemin relatif): ', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log("Échec de l'enregistrement du ServiceWorker avec chemin relatif: ", error);
+                });
+            });
+        });
+    }
     </script>
 </body>
 </html>
