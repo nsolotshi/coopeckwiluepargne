@@ -1,5 +1,5 @@
 [build]
-  publish = "/"  # Le répertoire où se trouve votre index.html
+  publish = "."
 
 [[headers]]
   for = "/*"
@@ -7,22 +7,20 @@
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "no-referrer"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
 [[headers]]
   for = "/sw.js"
   [headers.values]
-    Cache-Control = "no-cache"
+    Cache-Control = "no-cache, no-store, must-revalidate"
     Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "max-age=86400"
 
 [[headers]]
   for = "/manifest.json"
   [headers.values]
-    Cache-Control = "public, max-age=3600"
-
-# Redirections pour le routing SPA (Single Page Application)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+    Cache-Control = "max-age=86400"
