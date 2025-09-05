@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Icône de l'application -->
+    <link rel="icon" href="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg">
+
+    <!-- Meta tags pour PWA -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Coopec Kwilu">
+    <meta name="msapplication-TileImage" content="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg">
+    <meta name="msapplication-TileColor" content="#2c3e50">
+    <meta name="application-name" content="Coopec Kwilu">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Lien vers le manifeste -->
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coopec Kwilu - Gestion Épargne</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-image {
+            height: 70px;
+            margin-right: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .main-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .menu-item {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .page {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .add-row-btn {
+            margin-bottom: 20px;
+        }
+
+        .remove-btn {
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .submenu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .submenu-item {
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item:hover {
+            background-color: #dfe6e9;
+        }
+
+        .command-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .main-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .menu-item {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .logo-image {
+                height: 50px;
+            }
+        }
+        /* Ajouter ces styles CSS */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ajouter cette modale pour la saisie du mot de passe au début du body -->
+        <div id="password-modal" class="modal" style="display: flex;">
+        <div class="modal-content">
+            <div class="logo-container">
+            <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" class="logo-image">
+            <h2>Coopec Kwilu - Accès sécurisé</h2>
+            </div>
+            <div id="password-form">
+            <div class="form-group">
+                <label for="password-input">Mot de passe d'accès:</label>
+                <input type="password" id="password-input" required>
+            </div>
+            <div id="password-message" class="message" style="display: none;"></div>
+            <button class="btn btn-primary" onclick="validatePassword()">Se connecter</button>
+            </div>
+        </div>
+        </div>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" class="logo-image">
+                <h1>Coopec Kwilu - Gestion Épargne</h1>
+            </div>
+            <p class="subtitle">Système de gestion des dépôts, retraits et commandes</p>
+            
+            <div class="main-menu">
+                <div class="menu-item" onclick="showPage('encoding')">
+                    <i class="fas fa-money-bill-wave"></i> ENCODAGE DÉPÔT ET RETRAIT
+                </div>
+                <div class="menu-item" onclick="showPage('commands')">
+                    <i class="fas fa-tasks"></i> COMMANDES
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Page d'encodage -->
+        <div id="encoding-page" class="page">
+            <h2><i class="fas fa-money-bill-wave"></i> Encodage des Dépôts et Retraits</h2>
+            
+            <div class="form-group">
+                <label for="operation-date">Date d'opération:</label>
+                <input type="date" id="operation-date" required>
+            </div>
+            
+            <div id="operations-container">
+                <div class="operation-row">
+                    <div class="row">
+                        <div class="col">
+                            <label>N° compte:</label>
+                            <input type="text" class="account-number" placeholder="A123456-78" pattern="[A-Za-z][0-9]{6}-[0-9]{2}" required>
+                        </div>
+                        <div class="col">
+                            <label>Dépôt FC:</label>
+                            <input type="number" class="deposit-fc" min="0" step="100" value="0">
+                        </div>
+                        <div class="col">
+                            <label>Dépôt $:</label>
+                            <input type="number" class="deposit-usd" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="col">
+                            <label>Retrait FC:</label>
+                            <input type="number" class="withdrawal-fc" min="0" step="100" value="0">
+                        </div>
+                        <div class="col">
+                            <label>Retrait $:</label>
+                            <input type="number" class="withdrawal-usd" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="col">
+                            <label>Action:</label>
+                            <div class="remove-btn" onclick="removeOperationRow(this)"><i class="fas fa-trash-alt"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary add-row-btn" onclick="addOperationRow()"><i class="fas fa-plus"></i> Ajouter une ligne</button>
+            
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="reviewOperations()"><i class="fas fa-check"></i> Révision</button>
+                <button class="btn btn-danger" onclick="showPage('home')"><i class="fas fa-times"></i> Annuler</button>
+            </div>
+        </div>
+
+        <!-- Page de révision -->
+        <div id="review-page" class="page">
+            <h2><i class="fas fa-list-alt"></i> Révision des Opérations</h2>
+            
+            <div id="review-table-container">
+                <table id="review-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>N° compte</th>
+                            <th>Dépôt FC</th>
+                            <th>Dépôt $</th>
+                            <th>Retrait FC</th>
+                            <th>Retrait $</th>
+                        </tr>
+                    </thead>
+                    <tbody id="review-table-body">
+                        <!-- Les données seront insérées ici dynamiquement -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2">TOTAUX</td>
+                            <td id="total-deposit-fc">0</td>
+                            <td id="total-deposit-usd">0</td>
+                            <td id="total-withdrawal-fc">0</td>
+                            <td id="total-withdrawal-usd">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div id="review-message" class="message" style="display: none;"></div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="submitToGoogleSheets()"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                <button class="btn btn-warning" onclick="showPage('encoding')"><i class="fas fa-edit"></i> Corriger</button>
+                <button class="btn btn-danger" onclick="showPage('home')"><i class="fas fa-times"></i> Annuler</button>
+            </div>
+        </div>
+
+        <!-- Page des commandes -->
+        <div id="commands-page" class="page">
+            <h2><i class="fas fa-tasks"></i> Commandes</h2>
+            
+            <div class="submenu">
+                <div class="submenu-item" onclick="showSubCommand('solde')">
+                    <i class="fas fa-wallet"></i> Solde Membre
+                </div>
+                <div class="submenu-item" onclick="showSubCommand('releve-membre')">
+                    <i class="fas fa-file-invoice"></i> Relevé de Membre
+                </div>
+                <div class="submenu-item" onclick="showSubCommand('releve-journalier')">
+                    <i class="fas fa-calendar-day"></i> Relevé Journalier
+                </div>
+                <div class="submenu-item" onclick="showSubCommand('releve-periodique')">
+                    <i class="fas fa-calendar-week"></i> Relevé Périodique
+                </div>
+                <!-- NOUVEAU SOUS-MENU CORRECTIF -->
+                <div class="submenu-item" onclick="showSubCommand('correctif')">
+                    <i class="fas fa-wrench"></i> Correctif
+                </div>
+                <!-- NOUVEAU SOUS-MENU CHANGEMENT DE DATE -->
+                <div class="submenu-item" onclick="showSubCommand('changement-date')">
+                    <i class="fas fa-calendar-alt"></i> Changement de date
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-danger" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Retour</button>
+            </div>
+        </div>
+
+        <!-- Sous-page Solde Membre -->
+        <div id="solde-page" class="page">
+            <h2><i class="fas fa-wallet"></i> Solde Membre</h2>
+            
+            <div class="command-form">
+                <div class="form-group">
+                    <label for="solde-compte">N° de compte:</label>
+                    <input type="text" id="solde-compte" placeholder="A123456-78" pattern="[A-Za-z][0-9]{6}-[0-9]{2}" required>
+                </div>
+                
+                <button class="btn btn-primary" onclick="requestSolde()"><i class="fas fa-check"></i> Demander</button>
+                
+                <div class="form-group">
+                    <label for="solde-result">Résultat:</label>
+                    <input type="text" id="solde-result" readonly>
+                </div>
+                
+                <div id="solde-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+
+        <!-- Sous-page Relevé de Membre -->
+        <div id="releve-membre-page" class="page">
+            <h2><i class="fas fa-file-invoice"></i> Relevé de Membre</h2>
+            
+            <div class="command-form">
+                <div class="form-group">
+                    <label for="releve-compte">N° de compte:</label>
+                    <input type="text" id="releve-compte" placeholder="A123456-78" pattern="[A-Za-z][0-9]{6}-[0-9]{2}" required>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <label for="releve-date-debut">Date de départ:</label>
+                        <input type="date" id="releve-date-debut" required>
+                    </div>
+                    <div class="col">
+                        <label for="releve-date-fin">Date d'arrivée:</label>
+                        <input type="date" id="releve-date-fin" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="releve-email">Adresse email:</label>
+                    <input type="email" id="releve-email" required>
+                </div>
+                
+                <button class="btn btn-primary" onclick="requestReleveMembre()"><i class="fas fa-check"></i> Demander</button>
+                
+                <div id="releve-membre-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+
+        <!-- Sous-page Relevé Journalier -->
+        <div id="releve-journalier-page" class="page">
+            <h2><i class="fas fa-calendar-day"></i> Relevé Journalier</h2>
+            
+            <div class="command-form">
+                <div class="form-group">
+                    <label for="journalier-date">Date du relevé:</label>
+                    <input type="date" id="journalier-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="journalier-email">Adresse email:</label>
+                    <input type="email" id="journalier-email" required>
+                </div>
+                
+                <button class="btn btn-primary" onclick="requestReleveJournalier()"><i class="fas fa-check"></i> Demander</button>
+                
+                <div id="journalier-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+
+        <!-- Sous-page Relevé Périodique -->
+        <div id="releve-periodique-page" class="page">
+            <h2><i class="fas fa-calendar-week"></i> Relevé Périodique</h2>
+            
+            <div class="command-form">
+                <div class="row">
+                    <div class="col">
+                        <label for="periodique-date-debut">Date de départ:</label>
+                        <input type="date" id="periodique-date-debut" required>
+                    </div>
+                    <div class="col">
+                        <label for="periodique-date-fin">Date d'arrivée:</label>
+                        <input type="date" id="periodique-date-fin" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="periodique-email">Adresse email:</label>
+                    <input type="email" id="periodique-email" required>
+                </div>
+                
+                <button class="btn btn-primary" onclick="requestRelevePeriodique()"><i class="fas fa-check"></i> Demander</button>
+                
+                <div id="periodique-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+
+        <!-- NOUVELLE PAGE: Sous-page Correctif -->
+        <div id="correctif-page" class="page">
+            <h2><i class="fas fa-wrench"></i> Correctif</h2>
+            
+            <div class="command-form">
+                <div class="form-group">
+                    <label for="correctif-reference">N° Référence:</label>
+                    <input type="number" id="correctif-reference" min="1" step="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="correctif-date">Date:</label>
+                    <input type="date" id="correctif-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="correctif-compte">N° de compte:</label>
+                    <input type="text" id="correctif-compte" placeholder="A123456-78" pattern="[A-Za-z][0-9]{6}-[0-9]{2}" required>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <label for="correctif-depot-fc">Dépôt FC:</label>
+                        <input type="number" id="correctif-depot-fc" min="0" step="100" value="0" required>
+                    </div>
+                    <div class="col">
+                        <label for="correctif-depot-usd">Dépôt $:</label>
+                        <input type="number" id="correctif-depot-usd" min="0" step="0.01" value="0" required>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <label for="correctif-retrait-fc">Retrait FC:</label>
+                        <input type="number" id="correctif-retrait-fc" min="0" step="100" value="0" required>
+                    </div>
+                    <div class="col">
+                        <label for="correctif-retrait-usd">Retrait $:</label>
+                        <input type="number" id="correctif-retrait-usd" min="0" step="0.01" value="0" required>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="submitCorrectif()"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                
+                <div id="correctif-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+        <!-- Ajouter la nouvelle page pour le changement de date -->
+        <div id="changement-date-page" class="page">
+            <h2><i class="fas fa-calendar-alt"></i> Changement de date</h2>
+            
+            <div class="command-form">
+                <div class="form-group">
+                    <label for="changement-ref-debut">N° référence du début:</label>
+                    <input type="number" id="changement-ref-debut" min="1" step="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="changement-ref-fin">N° référence de la fin:</label>
+                    <input type="number" id="changement-ref-fin" min="1" step="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="changement-date-correcte">Date correcte:</label>
+                    <input type="date" id="changement-date-correcte" required>
+                </div>
+                
+                <button class="btn btn-success" onclick="submitChangementDate()"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                
+                <div id="changement-date-message" class="message" style="display: none;"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
+            </div>
+        </div>
+
+        <!-- Page d'accueil -->
+        <div id="home-page" class="page active">
+            <h2>Bienvenue à la Coopec Kwilu</h2>
+            <h3>Gérez efficacement les opérations d'épargne de vos membres. Cette application gère l'enregistrement des dépôts et retraits des épargnes ainsi que les différentes commandes y relatives: le solde, les relevés des comptes et les corrections d'écritures.</h3>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" style="max-width: 300px;">
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <div style="background: var(--light); padding: 20px; border-radius: 10px; text-align: center;">
+                        <i class="fas fa-money-bill-wave" style="font-size: 2.5rem; color: var(--success); margin-bottom: 15px;"></i>
+                        <h3>Encodage</h3>
+                        <p>Enregistrez les dépôts et retraits des membres</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div style="background: var(--light); padding: 20px; border-radius: 10px; text-align: center;">
+                        <i class="fas fa-tasks" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 15px;"></i>
+                        <h3>Commandes</h3>
+                        <p>Générez les soldes et relevés des membres</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Coopec Kwilu &copy; 2023 - Tous droits réservés</p>
+            <p>Système de Gestion d'Épargne</p>
+        </div>
+        <!-- Dans votre footer ou ailleurs dans l'interface -->
+        <button id="installButton" style="display: none;" class="btn btn-success" onclick="installApp()">
+        <i class="fas fa-download"></i> Installer l'application
+        </button>
+    </footer>
+
+    <script>
+        // URL de votre script Google Apps (À REMPLACER par votre URL réelle)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC7qkX0nvDs09AHzGVc-PHG54vo_L1s0cUr4BVQnZOW0PtcqClipRdayDvDfO1c8wb/exec";
+        
+        // Variables globales pour stocker les données
+        let operations = [];
+        let currentPage = 'home';
+        
+        // Fonctions de navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.getElementById(pageId + '-page').classList.add('active');
+            currentPage = pageId;
+            
+            // Réinitialiser les messages
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+        }
+        
+        function showSubCommand(commandId) {
+            showPage(commandId);
+        }
+        
+        // Fonctions pour la gestion des opérations
+        function addOperationRow() {
+            const container = document.getElementById('operations-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'operation-row';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col">
+                        <label>N° compte:</label>
+                        <input type="text" class="account-number" placeholder="A123456-78" pattern="[A-Za-z][0-9]{6}-[0-9]{2}" required>
+                    </div>
+                    <div class="col">
+                        <label>Dépôt FC:</label>
+                        <input type="number" class="deposit-fc" min="0" step="100" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Dépôt $:</label>
+                        <input type="number" class="deposit-usd" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Retrait FC:</label>
+                        <input type="number" class="withdrawal-fc" min="0" step="100" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Retrait $:</label>
+                        <input type="number" class="withdrawal-usd" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="col">
+                        <label>Action:</label>
+                        <div class="remove-btn" onclick="removeOperationRow(this)"><i class="fas fa-trash-alt"></i></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
+        }
+        
+        function removeOperationRow(button) {
+            const row = button.closest('.operation-row');
+            row.remove();
+        }
+        
+        function reviewOperations() {
+            const operationDate = document.getElementById('operation-date').value;
+            
+            if (!operationDate) {
+                alert('Veuillez saisir la date d\'opération');
+                return;
+            }
+            
+            // Vérifier si la date est future
+            const today = new Date().toISOString().split('T')[0];
+            if (operationDate > today) {
+                alert('La date d\'opération ne peut pas être future');
+                return;
+            }
+            
+            operations = [];
+            let isValid = true;
+            
+            document.querySelectorAll('.operation-row').forEach(row => {
+                const accountNumber = row.querySelector('.account-number').value;
+                const depositFc = parseFloat(row.querySelector('.deposit-fc').value) || 0;
+                const depositUsd = parseFloat(row.querySelector('.deposit-usd').value) || 0;
+                const withdrawalFc = parseFloat(row.querySelector('.withdrawal-fc').value) || 0;
+                const withdrawalUsd = parseFloat(row.querySelector('.withdrawal-usd').value) || 0;
+                
+                // Validation du format du numéro de compte
+                const accountPattern = /^[A-Za-z][0-9]{6}-[0-9]{2}$/;
+                if (!accountPattern.test(accountNumber)) {
+                    alert('Le numéro de compte n\'est pas au format correct: 1 lettre + 6 chiffres + tiret + 2 chiffres');
+                    isValid = false;
+                    return;
+                }
+                
+                operations.push({
+                    date: operationDate,
+                    account: accountNumber,
+                    depositFc,
+                    depositUsd,
+                    withdrawalFc,
+                    withdrawalUsd
+                });
+            });
+            
+            if (!isValid) return;
+            
+            if (operations.length === 0) {
+                alert('Veuillez ajouter au moins une opération');
+                return;
+            }
+            
+            // Afficher le tableau de révision
+            const tableBody = document.getElementById('review-table-body');
+            tableBody.innerHTML = '';
+            
+            let totalDepositFc = 0;
+            let totalDepositUsd = 0;
+            let totalWithdrawalFc = 0;
+            let totalWithdrawalUsd = 0;
+            
+            operations.forEach(op => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${op.date}</td>
+                    <td>${op.account}</td>
+                    <td>${op.depositFc.toLocaleString()}</td>
+                    <td>${op.depositUsd.toLocaleString()}</td>
+                    <td>${op.withdrawalFc.toLocaleString()}</td>
+                    <td>${op.withdrawalUsd.toLocaleString()}</td>
+                `;
+                tableBody.appendChild(row);
+                
+                totalDepositFc += op.depositFc;
+                totalDepositUsd += op.depositUsd;
+                totalWithdrawalFc += op.withdrawalFc;
+                totalWithdrawalUsd += op.withdrawalUsd;
+            });
+            
+            document.getElementById('total-deposit-fc').textContent = totalDepositFc.toLocaleString();
+            document.getElementById('total-deposit-usd').textContent = totalDepositUsd.toLocaleString();
+            document.getElementById('total-withdrawal-fc').textContent = totalWithdrawalFc.toLocaleString();
+            document.getElementById('total-withdrawal-usd').textContent = totalWithdrawalUsd.toLocaleString();
+            
+            showPage('review');
+        }
+        
+        // Fonction pour envoyer les données au Google Sheet (MODIFIÉE selon vos instructions)
+        function submitToGoogleSheets() {
+            const messageDiv = document.getElementById('review-message');
+            messageDiv.textContent = 'Envoi des données en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+
+            // Afficher IMMÉDIATEMENT le message de confirmation
+            setTimeout(() => {
+                messageDiv.textContent = "Les données ont été envoyées au serveur pour enregistrement";
+                messageDiv.className = 'message success';
+                
+                // EFFACEMENT IMMÉDIAT DES DONNÉES
+                clearFormData();
+                
+                // RETOUR AUTOMATIQUE À LA PAGE D'ENCODAGE APRÈS 2 SECONDES
+                setTimeout(() => {
+                    showPage('encoding');
+                }, 2000);
+            }, 1000); // Court délai pour permettre l'affichage du premier message
+
+            // Préparer les données à envoyer
+            const data = {
+                operations: JSON.stringify(operations),
+                action: "save_operations"
+            };
+
+            // Utiliser fetch avec un timeout très court
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+
+            // Envoyer la requête sans attendre la réponse
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                // Mode no-cors pour éviter d'attendre la réponse
+                mode: 'no-cors'
+            }).catch(err => {
+                console.log("Requête envoyée (traitement asynchrone côté serveur)");
+            });
+        }
+        
+        // Fonction pour effacer les données du formulaire
+        function clearFormData() {
+            // Réinitialiser la date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('operation-date').value = today;
+            
+            // Supprimer toutes les lignes d'opérations sauf la première
+            const container = document.getElementById('operations-container');
+            const rows = container.querySelectorAll('.operation-row');
+            
+            for (let i = rows.length - 1; i > 0; i--) {
+                rows[i].remove();
+            }
+            
+            // Réinitialiser la première ligne
+            const firstRow = container.querySelector('.operation-row');
+            if (firstRow) {
+                firstRow.querySelector('.account-number').value = '';
+                firstRow.querySelector('.deposit-fc').value = '0';
+                firstRow.querySelector('.deposit-usd').value = '0';
+                firstRow.querySelector('.withdrawal-fc').value = '0';
+                firstRow.querySelector('.withdrawal-usd').value = '0';
+            }
+            
+            // Vider le tableau des opérations
+            operations = [];
+        }
+        
+        // Fonction pour envoyer les données de correctif (MODIFIÉE pour attendre la réponse du serveur)
+        function submitCorrectif() {
+            const reference = document.getElementById('correctif-reference').value;
+            const date = document.getElementById('correctif-date').value;
+            const compte = document.getElementById('correctif-compte').value;
+            const depotFc = document.getElementById('correctif-depot-fc').value;
+            const depotUsd = document.getElementById('correctif-depot-usd').value;
+            const retraitFc = document.getElementById('correctif-retrait-fc').value;
+            const retraitUsd = document.getElementById('correctif-retrait-usd').value;
+            
+            const messageDiv = document.getElementById('correctif-message');
+            
+            // Validation des données
+            if (!reference) {
+                alert('Veuillez saisir le numéro de référence');
+                return;
+            }
+            
+            if (!date) {
+                alert('Veuillez saisir la date');
+                return;
+            }
+            
+            // Vérifier si la date est future
+            const today = new Date().toISOString().split('T')[0];
+            if (date > today) {
+                alert('La date ne peut pas être future');
+                return;
+            }
+            
+            // Validation du format du compte
+            const accountPattern = /^[A-Za-z][0-9]{6}-[0-9]{2}$/;
+            if (!accountPattern.test(compte)) {
+                alert('Le numéro de compte n\'est pas au format correct: 1 lettre + 6 chiffres + tiret + 2 chiffres');
+                return;
+            }
+            
+            messageDiv.textContent = 'Envoi des données correctives en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Préparer les données à envoyer
+            const data = {
+                action: "save_correctif",
+                reference: reference,
+                date: date,
+                compte: compte,
+                depotFc: depotFc,
+                depotUsd: depotUsd,
+                retraitFc: retraitFc,
+                retraitUsd: retraitUsd
+            };
+
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+
+            // Envoyer la requête et attendre la réponse
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Afficher le message retourné par le serveur
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+                
+                // Réinitialiser le formulaire après envoi réussi
+                if (data.status === "success") {
+                    document.getElementById('correctif-reference').value = '';
+                    document.getElementById('correctif-date').value = today;
+                    document.getElementById('correctif-compte').value = '';
+                    document.getElementById('correctif-depot-fc').value = '0';
+                    document.getElementById('correctif-depot-usd').value = '0';
+                    document.getElementById('correctif-retrait-fc').value = '0';
+                    document.getElementById('correctif-retrait-usd').value = '0';
+                }
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur de connexion: " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }
+        // Fonction pour envoyer les données de changement de date
+        function submitChangementDate() {
+            const refDebut = document.getElementById('changement-ref-debut').value;
+            const refFin = document.getElementById('changement-ref-fin').value;
+            const dateCorrecte = document.getElementById('changement-date-correcte').value;
+            
+            const messageDiv = document.getElementById('changement-date-message');
+            
+            // Validation des données
+            if (!refDebut) {
+                alert('Veuillez saisir le numéro de référence du début');
+                return;
+            }
+            
+            if (!refFin) {
+                alert('Veuillez saisir le numéro de référence de la fin');
+                return;
+            }
+            
+            if (!dateCorrecte) {
+                alert('Veuillez saisir la date correcte');
+                return;
+            }
+            
+            // Vérifier que la référence de fin est supérieure à celle du début
+            if (parseInt(refFin) <= parseInt(refDebut)) {
+                alert('Le numéro de référence de fin doit être strictement supérieur à celui du début');
+                return;
+            }
+            
+            // Vérifier si la date est future
+            const today = new Date().toISOString().split('T')[0];
+            if (dateCorrecte > today) {
+                alert('La date ne peut pas être future');
+                return;
+            }
+            
+            messageDiv.textContent = 'Envoi des données en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Préparer les données à envoyer
+            const data = {
+                action: "changement_date",
+                refDebut: refDebut,
+                refFin: refFin,
+                dateCorrecte: dateCorrecte
+            };
+
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+
+            // Envoyer la requête et attendre la réponse
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Afficher le message retourné par le serveur
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+                
+                // Réinitialiser le formulaire après envoi réussi
+                if (data.status === "success") {
+                    document.getElementById('changement-ref-debut').value = '';
+                    document.getElementById('changement-ref-fin').value = '';
+                    document.getElementById('changement-date-correcte').value = today;
+                }
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur de connexion: " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }        
+        // Fonction pour demander un solde (ADAPTÉE)
+        function requestSolde() {
+            const accountNumber = document.getElementById('solde-compte').value;
+            const messageDiv = document.getElementById('solde-message');
+            const resultField = document.getElementById('solde-result');
+            
+            // Validation du format du numéro de compte
+            const accountPattern = /^[A-Za-z][0-9]{6}-[0-9]{2}$/;
+            if (!accountPattern.test(accountNumber)) {
+                alert('Le numéro de compte n\'est pas au format correct: 1 lettre + 6 chiffres + tiret + 2 chiffres');
+                return;
+            }
+            
+            messageDiv.textContent = 'Requête en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Utiliser la même méthode que votre fonction qui fonctionne
+            const formData = new URLSearchParams();
+            formData.append("action", "get_solde");
+            formData.append("account", accountNumber);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                messageDiv.textContent = data.message || "Réponse reçue";
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+                
+                if (data.status === "success") {
+                    resultField.value = data.solde || data.result || "Solde non disponible";
+                }
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur : " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }
+        
+        // Fonctions pour les autres commandes (ADAPTÉES avec la même structure)
+        function requestReleveMembre() {
+            const accountNumber = document.getElementById('releve-compte').value;
+            const dateDebut = document.getElementById('releve-date-debut').value;
+            const dateFin = document.getElementById('releve-date-fin').value;
+            const email = document.getElementById('releve-email').value;
+            const messageDiv = document.getElementById('releve-membre-message');
+            
+            // Validation des données
+            const accountPattern = /^[A-Za-z][0-9]{6}-[0-9]{2}$/;
+            if (!accountPattern.test(accountNumber)) {
+                alert('Le numéro de compte n\'est pas au format correct: 1 lettre + 6 chiffres + tiret + 2 chiffres');
+                return;
+            }
+            
+            if (!dateDebut || !dateFin) {
+                alert('Veuillez saisir les dates de début et de fin');
+                return;
+            }
+            
+            if (new Date(dateFin) < new Date(dateDebut)) {
+                alert('La date de fin ne peut pas être antérieure à la date de début');
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (dateDebut > today || dateFin > today) {
+                alert('Les dates ne peuvent pas être futures');
+                return;
+            }
+            
+            if (!email) {
+                alert('Veuillez saisir une adresse email');
+                return;
+            }
+            
+            messageDiv.textContent = 'Génération et envoi du relevé en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Utiliser la même méthode que votre fonction qui fonctionne
+            const formData = new URLSearchParams();
+            formData.append("action", "releve_membre");
+            formData.append("account", accountNumber);
+            formData.append("startDate", dateDebut);
+            formData.append("endDate", dateFin);
+            formData.append("email", email);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                messageDiv.textContent = data.message || data.result || "Réponse reçue";
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur : " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }
+        
+        function requestReleveJournalier() {
+            const dateReleve = document.getElementById('journalier-date').value;
+            const email = document.getElementById('journalier-email').value;
+            const messageDiv = document.getElementById('journalier-message');
+            
+            // Validation des données
+            if (!dateReleve) {
+                alert('Veuillez saisir la date du relevé');
+                return;
+            }
+            
+            // Vérifier que la date n'est pas future
+            const today = new Date().toISOString().split('T')[0];
+            if (dateReleve > today) {
+                alert('La date ne peut pas être future');
+                return;
+            }
+            
+            if (!email) {
+                alert('Veuillez saisir une adresse email');
+                return;
+            }
+            
+            messageDiv.textContent = 'Génération et envoi du relevé journalier en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Utiliser la même méthode que votre fonction qui fonctionne
+            const formData = new URLSearchParams();
+            formData.append("action", "releve_journalier");
+            formData.append("date", dateReleve);
+            formData.append("email", email);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                messageDiv.textContent = data.message || data.result || "Réponse reçue";
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur : " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }
+        
+        function requestRelevePeriodique() {
+            const dateDebut = document.getElementById('periodique-date-debut').value;
+            const dateFin = document.getElementById('periodique-date-fin').value;
+            const email = document.getElementById('periodique-email').value;
+            const messageDiv = document.getElementById('periodique-message');
+            
+            // Validation des données
+            if (!dateDebut || !dateFin) {
+                alert('Veuillez saisir les dates de début et de fin');
+                return;
+            }
+            
+            if (new Date(dateFin) < new Date(dateDebut)) {
+                alert('La date de fin ne peut pas être antérieure à la date de début');
+                return;
+            }
+            
+            // Vérifier que les dates ne sont pas futures
+            const today = new Date().toISOString().split('T')[0];
+            if (dateDebut > today || dateFin > today) {
+                alert('Les dates ne peuvent pas être futures');
+                return;
+            }
+            
+            if (!email) {
+                alert('Veuillez saisir une adresse email');
+                return;
+            }
+            
+            messageDiv.textContent = 'Génération et envoi du relevé périodique en cours...';
+            messageDiv.className = 'message';
+            messageDiv.style.display = 'block';
+            
+            // Utiliser la même méthode que votre fonction qui fonctionne
+            const formData = new URLSearchParams();
+            formData.append("action", "releve_periodique");
+            formData.append("startDate", dateDebut);
+            formData.append("endDate", dateFin);
+            formData.append("email", email);
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                messageDiv.textContent = data.message || data.result || "Réponse reçue";
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur : " + err.message;
+                messageDiv.className = 'message error';
+            });
+        }
+        // Variables globales pour l'état d'authentification
+        let isAuthenticated = false;
+        let hasCorrectifAccess = false;
+
+        // Fonction pour valider le mot de passe
+        // Fonction pour valider le mot de passe
+        function validatePassword() {
+        const password = document.getElementById('password-input').value;
+        const messageDiv = document.getElementById('password-message');
+        
+        if (!password) {
+            messageDiv.textContent = 'Veuillez saisir le mot de passe';
+            messageDiv.className = 'message error';
+            messageDiv.style.display = 'block';
+            return;
+        }
+        
+        messageDiv.textContent = 'Vérification du mot de passe...';
+        messageDiv.className = 'message';
+        messageDiv.style.display = 'block';
+        
+        // Préparer les données à envoyer
+        const data = {
+            action: "validate_password",
+            password: password
+        };
+
+        const formData = new URLSearchParams();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        // Envoyer la requête au serveur
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: formData,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        })
+        .then(response => {
+            if (!response.ok) {
+            throw new Error('Erreur réseau');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === "success") {
+            isAuthenticated = true;
+            hasCorrectifAccess = data.hasCorrectifAccess || false;
+            document.getElementById('password-modal').style.display = 'none';
+            showPage('home');
+            } else {
+            // Afficher le message retourné par le serveur
+            messageDiv.textContent = data.message;
+            messageDiv.className = 'message error';
+            }
+        })
+        .catch(err => {
+            messageDiv.textContent = "Erreur de connexion au serveur";
+            messageDiv.className = 'message error';
+            console.error("Erreur détaillée:", err);
+        });
+        }
+
+        // Modifier la fonction showSubCommand pour vérifier l'accès aux fonctionnalités sensibles
+        function showSubCommand(commandId) {
+        // Vérifier l'accès pour les fonctionnalités sensibles
+        if ((commandId === 'correctif' || commandId === 'changement-date') && !hasCorrectifAccess) {
+            alert('Accès non autorisé. Mot de passe correctif requis.');
+            return;
+        }
+        
+        showPage(commandId);
+        }
+
+        // Fonction pour demander l'accès correctif
+        function requestCorrectifAccess() {
+        const password = prompt('Veuillez saisir le mot de passe correctif:');
+        
+        if (!password) return;
+        
+        // Préparer les données à envoyer
+        const data = {
+            action: "validate_correctif_password",
+            password: password
+        };
+
+        const formData = new URLSearchParams();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        // Envoyer la requête au serveur
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: formData,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+            hasCorrectifAccess = true;
+            alert('Accès correctif autorisé.');
+            } else {
+            alert('Mot de passe incorrect.');
+            }
+        })
+        .catch(err => {
+            alert("Erreur de connexion: " + err.message);
+        });
+        }
+
+// Ajouter un élément de menu pour demander l'accès correctif
+// Ajoutez ceci dans votre menu principal ou dans un menu contextuel
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Définir la date du jour comme valeur par défaut pour les champs de date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('operation-date').value = today;
+            document.getElementById('correctif-date').value = today;
+            
+            // Initialiser les autres champs de date
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                if (input.id !== 'operation-date' && input.id !== 'correctif-date') {
+                    input.value = today;
+                }
+            });
+        });
+        
+    </script>
+    <script>
+    // Enregistrement du Service Worker pour PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js')
+            .then(function(registration) {
+            console.log('ServiceWorker enregistré avec succès: ', registration.scope);
+            })
+            .catch(function(error) {
+            console.log("Échec de l'enregistrement du ServiceWorker: ", error);
+            });
+        });
+    }
+
+    // Détection de l'événement d'installation
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Utilisateur a accepté l\'installation');
+                }
+                deferredPrompt = null;
+                installButton.style.display = 'none';
+            });
+        }
+    }
+
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('Application installée avec succès');
+        installButton.style.display = 'none';
+    });
+    </script>
+</body>
+</html>

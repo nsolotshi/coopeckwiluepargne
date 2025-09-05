@@ -1,0 +1,44 @@
+[build]
+  publish = "."
+  command = "echo 'No build command needed for static HTML'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Configuration des en-têtes de sécurité
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # Cache statique pour les ressources
+    Cache-Control = "public, max-age=3600"
+
+# Configuration spécifique pour les fichiers de cache à long terme
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Redirections pour SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Configuration pour le prérendu (optionnel)
+[context.production.environment]
+  NODE_ENV = "production"
