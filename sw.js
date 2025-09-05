@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coopec-kwilu-v2';
+const CACHE_NAME = 'coopeckwilu-v1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -24,21 +24,7 @@ self.addEventListener('fetch', function(event) {
       .then(function(response) {
         // Retourne la réponse en cache ou fetch la requête
         return response || fetch(event.request);
-      })
-  );
-});
-
-// Nettoyage des anciens caches
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+      }
+    )
   );
 });
