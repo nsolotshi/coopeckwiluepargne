@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#2c3e50",
   "theme_color": "#2c3e50",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
       "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
@@ -22,5 +22,6 @@
     }
   ],
   "categories": ["business", "finance", "productivity"],
-  "lang": "fr"
+  "lang": "fr",
+  "scope": "/"
 }
