@@ -420,6 +420,16 @@
     </style>
 </head>
 <body>
+    <div class="debug-info" id="debugInfo"></div>
+    <div class="desktop-badge" id="desktopBadge">Version Desktop</div>
+    <div class="install-icon-hint" id="installIconHint">
+        <i class="fas fa-arrow-right"></i>
+    </div>
+    <div class="desktop-install-hint" id="desktopInstallHint">
+        <span class="close" onclick="closeDesktopHint()">&times;</span>
+        <h4>Installation sur Desktop</h4>
+        <p>Pour installer cette application, cliquez sur l'icône <i class="fas fa-download"></i> dans la barre d'adresse de votre navigateur.</p>
+    </div>
     <!-- Ajouter cette modale pour la saisie du mot de passe au début du body -->
     <div id="password-modal" class="modal" style="display: flex;">
         <div class="modal-content">
@@ -854,6 +864,371 @@
                 msg.style.display = 'none';
             });
         }
+        // ==================== GESTION PWA AMÉLIORÉE ====================
+        let deferredPrompt = null;
+        const installButton = document.getElementById('installButton');
+        const pwaStatus = document.getElementById('pwaStatus');
+        const installInstructions = document.getElementById('installInstructions');
+        const debugInfo = document.getElementById('debugInfo');
+        const desktopBadge = document.getElementById('desktopBadge');
+        const desktopInstallHint = document.getElementById('desktopInstallHint');
+        const installIconHint = document.getElementById('installIconHint');
+
+        // Détection du type d'appareil
+        function getDeviceType() {
+            const userAgent = navigator.userAgent;
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
+                return 'mobile';
+            } else if (/Mac|Win/i.test(userAgent)) {
+                return 'desktop';
+            }
+            return 'other';
+        }
+
+        // Fermer l'indice d'installation desktop
+        function closeDesktopHint() {
+            if (desktopInstallHint) {
+                desktopInstallHint.style.display = 'none';
+            }
+            if (installIconHint) {
+                installIconHint.style.display = 'none';
+            }
+            // Stocker en localStorage pour ne plus afficher
+            localStorage.setItem('desktopHintClosed', 'true');
+        }
+
+        // Afficher les informations de débogage
+        function showDebugInfo(message) {
+            if (debugInfo) {
+                debugInfo.textContent = message;
+                debugInfo.style.display = 'block';
+                console.log('DEBUG:', message);
+            }
+        }
+
+        // Vérifier si le navigateur supporte les PWA
+        function checkPWACompatibility() {
+            const isCompatible = 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
+            showDebugInfo(`PWA Compatible: ${isCompatible}`);
+            return isCompatible;
+        }
+
+        // Enregistrement du Service Worker
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    showDebugInfo('SW enregistré: ' + registration.scope);
+                    
+                    // Vérifier s'il y a une mise à jour en attente
+                    if (registration.waiting) {
+                        showDebugInfo('Nouveau Service Worker en attente');
+                    }
+                    
+                    // Écouter les mises à jour
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        showDebugInfo('Nouveau Service Worker en installation');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed') {
+                                showDebugInfo('Nouveau Service Worker installé');
+                            }
+                        });
+                    });
+                    
+                    return registration;
+                } catch (error) {
+                    showDebugInfo('Échec enregistrement SW: ' + error.message);
+                    showPWAStatus('Service Worker non supporté', 'error');
+                    return null;
+                }
+            }
+            showDebugInfo('Service Worker non supporté');
+            return null;
+        }
+
+        // Vérifier si l'app est déjà installée
+        function checkIfAppIsInstalled() {
+            // Méthode 1: display-mode
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                showDebugInfo('Application en mode standalone');
+                showPWAStatus('Application déjà installée', 'success');
+                if (installButton) installButton.style.display = 'none';
+                return true;
+            }
+            
+            // Méthode 2: navigator.standalone (iOS)
+            if (window.navigator.standalone === true) {
+                showDebugInfo('Application en mode standalone iOS');
+                showPWAStatus('Application déjà installée', 'success');
+                if (installButton) installButton.style.display = 'none';
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Fonction pour déclencher l'installation
+        function installApp() {
+            if (!deferredPrompt) {
+                showDebugInfo('Aucune invite d\'installation disponible');
+                showInstallInstructions();
+                return;
+            }
+            
+            // Afficher l'invite d'installation
+            deferredPrompt.prompt();
+            
+            // Attendre que l'utilisateur réponde à l'invite
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    showDebugInfo('Utilisateur a accepté l\'installation');
+                    showPWAStatus('Application installée avec succès!', 'success');
+                    // Cacher le bouton d'installation après acceptation
+                    if (installButton) {
+                        installButton.style.display = 'none';
+                    }
+                } else {
+                    showDebugInfo('Utilisateur a refusé l\'installation');
+                    showPWAStatus('Installation annulée', 'error');
+                }
+                
+                // Réinitialiser deferredPrompt
+                deferredPrompt = null;
+            });
+        }
+
+        // Fonction pour afficher les instructions d'installation manuelle
+        function showInstallInstructions() {
+            const deviceType = getDeviceType();
+            
+            if (installInstructions) {
+                installInstructions.style.display = 'block';
+            }
+            
+            if (deviceType === 'mobile') {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIOS) {
+                    showPWAStatus('Utilisez le menu de partage Safari pour installer', 'info');
+                } else {
+                    showPWAStatus('Utilisez le menu Chrome pour installer', 'info');
+                }
+            } else if (deviceType === 'desktop') {
+                showPWAStatus('Recherchez l\'icône d\'installation dans la barre d\'adresse', 'info');
+                
+                // Afficher l'indice pour desktop après un délai
+                setTimeout(() => {
+                    if (!localStorage.getItem('desktopHintClosed') && desktopInstallHint) {
+                        desktopInstallHint.style.display = 'block';
+                    }
+                }, 3000);
+            } else {
+                showPWAStatus('Votre navigateur supporte l\'installation d\'applications', 'info');
+            }
+        }
+
+        // Afficher le statut PWA
+        function showPWAStatus(message, type) {
+            if (!pwaStatus) return;
+            
+            // Mettre à jour le texte et les classes
+            const icon = pwaStatus.querySelector('i');
+            const text = pwaStatus.querySelector('span');
+            
+            if (text) text.textContent = message;
+            
+            pwaStatus.className = 'pwa-status';
+            
+            if (type === 'success') {
+                pwaStatus.classList.add('pwa-success');
+                if (icon) icon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                pwaStatus.classList.add('pwa-error');
+                if (icon) icon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'info') {
+                pwaStatus.classList.add('pwa-info');
+                if (icon) icon.className = 'fas fa-info-circle';
+            } else {
+                pwaStatus.classList.add('pwa-loading');
+                if (icon) icon.className = 'fas fa-spinner fa-spin';
+            }
+            
+            pwaStatus.style.display = 'flex';
+        }
+
+        // Vérifier les critères d'installation PWA
+        function checkPWAInstallCriteria() {
+            // Vérifier que nous sommes en HTTPS
+            const isSecure = window.location.protocol === 'https:';
+            
+            // Vérifier que le service worker est enregistré
+            const hasSW = 'serviceWorker' in navigator;
+            
+            // Vérifier que le manifeste est valide
+            const hasManifest = document.querySelector('link[rel="manifest"]') !== null;
+            
+            showDebugInfo(`Secure: ${isSecure}, SW: ${hasSW}, Manifest: ${hasManifest}`);
+            
+            return isSecure && hasSW && hasManifest;
+        }
+
+        // Vérifier la visibilité de l'icône d'installation dans la barre d'adresse
+        function checkInstallIconVisibility() {
+            return new Promise((resolve) => {
+                if (getDeviceType() !== 'desktop') {
+                    resolve(false);
+                    return;
+                }
+
+                // Sur desktop, on vérifie périodiquement si l'icône d'installation est visible
+                let checks = 0;
+                const maxChecks = 10;
+                
+                const checkInterval = setInterval(() => {
+                    checks++;
+                    
+                    // Si deferredPrompt est disponible, l'icône devrait être visible
+                    if (deferredPrompt) {
+                        clearInterval(checkInterval);
+                        resolve(true);
+                    } else if (checks >= maxChecks) {
+                        clearInterval(checkInterval);
+                        resolve(false);
+                    }
+                }, 500);
+            });
+        }
+
+        // Initialiser PWA
+        async function initializePWA() {
+            showDebugInfo('Initialisation PWA...');
+            
+            // Afficher le badge desktop si pertinent
+            if (getDeviceType() === 'desktop' && desktopBadge) {
+                desktopBadge.style.display = 'block';
+            }
+            
+            if (!checkPWACompatibility()) {
+                showPWAStatus('Fonctionnalités PWA non supportées', 'error');
+                return;
+            }
+            
+            showPWAStatus('Vérification de l\'installation...', 'loading');
+            
+            // Vérifier les critères d'installation
+            if (!checkPWAInstallCriteria()) {
+                showPWAStatus('Critères d\'installation PWA non remplis', 'error');
+                return;
+            }
+            
+            // Enregistrer le Service Worker
+            await registerServiceWorker();
+            
+            // Vérifier si l'app est déjà installée
+            if (!checkIfAppIsInstalled()) {
+                // Configurer le bouton d'installation
+                if (installButton) {
+                    installButton.addEventListener('click', installApp);
+                }
+                
+                // Vérifier périodiquement si l'événement beforeinstallprompt se déclenche
+                let checkCount = 0;
+                const maxChecks = 15; // Augmenté pour desktop
+                const checkInterval = setInterval(() => {
+                    checkCount++;
+                    
+                    if (deferredPrompt) {
+                        clearInterval(checkInterval);
+                        showPWAStatus('Application prête à être installée', 'success');
+                        if (installButton) installButton.style.display = 'block';
+                        
+                        // Sur desktop, vérifier si l'icône d'installation est visible
+                        if (getDeviceType() === 'desktop') {
+                            checkInstallIconVisibility().then((isVisible) => {
+                                if (isVisible && !localStorage.getItem('desktopHintClosed')) {
+                                    // Afficher l'indice pour l'icône d'installation
+                                    setTimeout(() => {
+                                        if (installIconHint) {
+                                            installIconHint.style.display = 'block';
+                                        }
+                                        if (desktopInstallHint) {
+                                            desktopInstallHint.style.display = 'block';
+                                        }
+                                    }, 2000);
+                                }
+                            });
+                        }
+                    } else if (checkCount >= maxChecks) {
+                        clearInterval(checkInterval);
+                        showPWAStatus('Fonctionnalité d\'installation non déclenchée', 'info');
+                        showInstallInstructions();
+                    }
+                }, 1000);
+            }
+        }
+
+        // Gestionnaire d'événement pour beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            showDebugInfo('Événement beforeinstallprompt déclenché');
+            
+            // Empêcher le mini-infobar d'apparaître sur mobile
+            e.preventDefault();
+            
+            // Stocker l'événement pour qu'il puisse être déclenché plus tard
+            deferredPrompt = e;
+            
+            // Afficher le bouton d'installation
+            if (installButton) {
+                installButton.style.display = 'block';
+            }
+            
+            showPWAStatus('Application prête à être installée', 'success');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            showDebugInfo('Application installée avec succès');
+            showPWAStatus('Application installée avec succès!', 'success');
+            
+            // Masquer le bouton d'installation
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+            
+            // Cacher les indices d'installation
+            if (desktopInstallHint) {
+                desktopInstallHint.style.display = 'none';
+            }
+            if (installIconHint) {
+                installIconHint.style.display = 'none';
+            }
+            
+            // Réinitialiser deferredPrompt
+            deferredPrompt = null;
+        });
+
+        // Détecter si l'application a été lancée depuis l'écran d'accueil
+        window.addEventListener('load', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                showDebugInfo('Lancé depuis l\'écran d\'accueil');
+                showPWAStatus('Application installée', 'success');
+            }
+        });
+
+        // Initialiser au chargement du document
+        document.addEventListener('DOMContentLoaded', function() {
+            // Démarrer l'initialisation PWA après un court délai
+            setTimeout(initializePWA, 1000);
+            
+            // Définir la date du jour comme valeur par défaut pour les champs de date
+            const today = new Date().toISOString().split('T')[0];
+            if (document.getElementById('operation-date')) {
+                document.getElementById('operation-date').value = today;
+            }
+            if (document.getElementById('correctif-date')) {
+                document.getElementById('correctif-date').value = today;
+            }
+        });
         
         function showSubCommand(commandId) {
             showPage(commandId);
@@ -1560,282 +1935,7 @@
         });
         
     </script>
-     <script>
-     // ==================== GESTION PWA AMÉLIORÉE ====================
-        let deferredPrompt = null;
-        const installButton = document.getElementById('installButton');
-        const pwaStatus = document.getElementById('pwaStatus');
-        const installInstructions = document.getElementById('installInstructions');
-        const debugInfo = document.getElementById('debugInfo');
-
-        // Afficher les informations de débogage
-        function showDebugInfo(message) {
-            if (debugInfo) {
-                debugInfo.textContent = message;
-                debugInfo.style.display = 'block';
-                console.log('DEBUG:', message);
-            }
-        }
-
-        // Vérifier si le navigateur supporte les PWA
-        function checkPWACompatibility() {
-            const isCompatible = 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
-            showDebugInfo(`PWA Compatible: ${isCompatible}`);
-            return isCompatible;
-        }
-
-        // Enregistrement du Service Worker
-        async function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    showDebugInfo('SW enregistré: ' + registration.scope);
-                    
-                    // Vérifier s'il y a une mise à jour en attente
-                    if (registration.waiting) {
-                        showDebugInfo('Nouveau Service Worker en attente');
-                    }
-                    
-                    // Écouter les mises à jour
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        showDebugInfo('Nouveau Service Worker en installation');
-                        
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed') {
-                                showDebugInfo('Nouveau Service Worker installé');
-                            }
-                        });
-                    });
-                    
-                    return registration;
-                } catch (error) {
-                    showDebugInfo('Échec enregistrement SW: ' + error.message);
-                    showPWAStatus('Service Worker non supporté', 'error');
-                    return null;
-                }
-            }
-            showDebugInfo('Service Worker non supporté');
-            return null;
-        }
-
-        // Vérifier si l'app est déjà installée
-        function checkIfAppIsInstalled() {
-            // Méthode 1: display-mode
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                showDebugInfo('Application en mode standalone');
-                showPWAStatus('Application déjà installée', 'success');
-                if (installButton) installButton.style.display = 'none';
-                return true;
-            }
-            
-            // Méthode 2: navigator.standalone (iOS)
-            if (window.navigator.standalone === true) {
-                showDebugInfo('Application en mode standalone iOS');
-                showPWAStatus('Application déjà installée', 'success');
-                if (installButton) installButton.style.display = 'none';
-                return true;
-            }
-            
-            return false;
-        }
-
-        // Fonction pour déclencher l'installation
-        function installApp() {
-            if (!deferredPrompt) {
-                showDebugInfo('Aucune invite d\'installation disponible');
-                showInstallInstructions();
-                return;
-            }
-            
-            // Afficher l'invite d'installation
-            deferredPrompt.prompt();
-            
-            // Attendre que l'utilisateur réponde à l'invite
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    showDebugInfo('Utilisateur a accepté l\'installation');
-                    showPWAStatus('Application installée avec succès!', 'success');
-                    // Cacher le bouton d'installation après acceptation
-                    if (installButton) {
-                        installButton.style.display = 'none';
-                    }
-                } else {
-                    showDebugInfo('Utilisateur a refusé l\'installation');
-                    showPWAStatus('Installation annulée', 'error');
-                }
-                
-                // Réinitialiser deferredPrompt
-                deferredPrompt = null;
-            });
-        }
-
-        // Fonction pour afficher les instructions d'installation manuelle
-        function showInstallInstructions() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isAndroid = /Android/.test(navigator.userAgent);
-            const isDesktop = !isIOS && !isAndroid;
-            
-            if (installInstructions) {
-                installInstructions.style.display = 'block';
-            }
-            
-            if (isIOS) {
-                showPWAStatus('Utilisez le menu de partage Safari pour installer', 'info');
-            } else if (isAndroid) {
-                showPWAStatus('Utilisez le menu Chrome pour installer', 'info');
-            } else if (isDesktop) {
-                showPWAStatus('Recherchez l\'icône d\'installation dans la barre d\'adresse', 'info');
-            } else {
-                showPWAStatus('Votre navigateur supporte l\'installation d\'applications', 'info');
-            }
-        }
-
-        // Afficher le statut PWA
-        function showPWAStatus(message, type) {
-            if (!pwaStatus) return;
-            
-            // Mettre à jour le texte et les classes
-            const icon = pwaStatus.querySelector('i');
-            const text = pwaStatus.querySelector('span');
-            
-            if (text) text.textContent = message;
-            
-            pwaStatus.className = 'pwa-status';
-            
-            if (type === 'success') {
-                pwaStatus.classList.add('pwa-success');
-                if (icon) icon.className = 'fas fa-check-circle';
-            } else if (type === 'error') {
-                pwaStatus.classList.add('pwa-error');
-                if (icon) icon.className = 'fas fa-exclamation-circle';
-            } else if (type === 'info') {
-                pwaStatus.classList.add('pwa-info');
-                if (icon) icon.className = 'fas fa-info-circle';
-            } else {
-                pwaStatus.classList.add('pwa-loading');
-                if (icon) icon.className = 'fas fa-spinner fa-spin';
-            }
-            
-            pwaStatus.style.display = 'flex';
-        }
-
-        // Vérifier les critères d'installation PWA
-        function checkPWAInstallCriteria() {
-            // Vérifier que nous sommes en HTTPS
-            const isSecure = window.location.protocol === 'https:';
-            
-            // Vérifier que le service worker est enregistré
-            const hasSW = 'serviceWorker' in navigator;
-            
-            // Vérifier que le manifeste est valide
-            const hasManifest = document.querySelector('link[rel="manifest"]') !== null;
-            
-            showDebugInfo(`Secure: ${isSecure}, SW: ${hasSW}, Manifest: ${hasManifest}`);
-            
-            return isSecure && hasSW && hasManifest;
-        }
-
-        // Initialiser PWA
-        function initializePWA() {
-            showDebugInfo('Initialisation PWA...');
-            
-            if (!checkPWACompatibility()) {
-                showPWAStatus('Fonctionnalités PWA non supportées', 'error');
-                return;
-            }
-            
-            showPWAStatus('Vérification de l\'installation...', 'loading');
-            
-            // Vérifier les critères d'installation
-            if (!checkPWAInstallCriteria()) {
-                showPWAStatus('Critères d\'installation PWA non remplis', 'error');
-                return;
-            }
-            
-            // Enregistrer le Service Worker
-            registerServiceWorker().then(() => {
-                // Vérifier si l'app est déjà installée
-                if (!checkIfAppIsInstalled()) {
-                    // Configurer le bouton d'installation
-                    if (installButton) {
-                        installButton.addEventListener('click', installApp);
-                    }
-                    
-                    // Vérifier périodiquement si l'événement beforeinstallprompt se déclenche
-                    let checkCount = 0;
-                    const maxChecks = 10;
-                    const checkInterval = setInterval(() => {
-                        checkCount++;
-                        
-                        if (deferredPrompt) {
-                            clearInterval(checkInterval);
-                            showPWAStatus('Application prête à être installée', 'success');
-                            if (installButton) installButton.style.display = 'block';
-                        } else if (checkCount >= maxChecks) {
-                            clearInterval(checkInterval);
-                            showPWAStatus('Fonctionnalité d\'installation non déclenchée', 'info');
-                            showInstallInstructions();
-                        }
-                    }, 1000);
-                }
-            });
-        }
-
-        // Gestionnaire d'événement pour beforeinstallprompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-            showDebugInfo('Événement beforeinstallprompt déclenché');
-            
-            // Empêcher le mini-infobar d'apparaître sur mobile
-            e.preventDefault();
-            
-            // Stocker l'événement pour qu'il puisse être déclenché plus tard
-            deferredPrompt = e;
-            
-            // Afficher le bouton d'installation
-            if (installButton) {
-                installButton.style.display = 'block';
-            }
-            
-            showPWAStatus('Application prête à être installée', 'success');
-        });
-
-        window.addEventListener('appinstalled', () => {
-            showDebugInfo('Application installée avec succès');
-            showPWAStatus('Application installée avec succès!', 'success');
-            
-            // Masquer le bouton d'installation
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-            
-            // Réinitialiser deferredPrompt
-            deferredPrompt = null;
-        });
-
-        // Détecter si l'application a été lancée depuis l'écran d'accueil
-        window.addEventListener('load', () => {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                showDebugInfo('Lancé depuis l\'écran d\'accueil');
-                showPWAStatus('Application installée', 'success');
-            }
-        });
-
-        // Initialiser au chargement du document
-        document.addEventListener('DOMContentLoaded', function() {
-            // Démarrer l'initialisation PWA après un court délai
-            setTimeout(initializePWA, 1000);
-            
-            // Définir la date du jour comme valeur par défaut pour les champs de date
-            const today = new Date().toISOString().split('T')[0];
-            if (document.getElementById('operation-date')) {
-                document.getElementById('operation-date').value = today;
-            }
-            if (document.getElementById('correctif-date')) {
-                document.getElementById('correctif-date').value = today;
-            }
-        });
-    </script>
 </body>
 </html>
+
 
