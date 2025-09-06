@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coopec-kwilu-v2';
+const CACHE_NAME = 'coopec-kwilu-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -11,13 +11,14 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
+        console.log('Cache ouvert');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
 self.addEventListener('fetch', function(event) {
-  // Ne pas mettre en cache les requêtes vers l'API Google Apps Script
+  // Ne pas mettre en cache les requêtes vers Google Apps Script
   if (event.request.url.includes('/macros/')) {
     return fetch(event.request);
   }
@@ -62,11 +63,4 @@ self.addEventListener('activate', function(event) {
       );
     })
   );
-});
-
-// Gérer les messages pour mettre à jour l'UI
-self.addEventListener('message', function(event) {
-  if (event.data.action === 'skipWaiting') {
-    self.skipWaiting();
-  }
 });
