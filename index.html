@@ -801,14 +801,15 @@
                         <p>Générez les soldes et relevés des membres</p>
                     </div>
                     
-                    <!-- Bouton d'installation -->
+                   <!-- Bouton d'installation -->
                     <button id="installButton" class="btn btn-success">
                         <i class="fas fa-download"></i> Installer l'application
                     </button>
                     
                     <!-- Instructions d'installation -->
                     <div id="pwaStatus" class="pwa-status pwa-loading" style="display: none;">
-                        Vérification de l'installation PWA...
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Vérification de l'installation PWA...</span>
                     </div>
                     
                     <div class="install-instructions" id="installInstructions" style="display: none;">
@@ -816,6 +817,7 @@
                         <ul>
                             <li><strong>Sur Chrome Android:</strong> Appuyez sur le menu (⋮) → "Ajouter à l'écran d'accueil"</li>
                             <li><strong>Sur Safari iOS:</strong> Appuyez sur l'icône de partage (⎗) → "Sur l'écran d'accueil"</li>
+                            <li><strong>Sur Desktop Chrome/Edge:</strong> Cliquez sur l'icône d'installation dans la barre d'adresse</li>
                         </ul>
                     </div>
                 </div>
@@ -1558,18 +1560,27 @@
         });
         
     </script>
-
-    <!-- ==================== GESTION PWA AMÉLIORÉE ==================== -->
-    <script>
-        let deferredPrompt;
+     <script>
+     // ==================== GESTION PWA AMÉLIORÉE ====================
+        let deferredPrompt = null;
         const installButton = document.getElementById('installButton');
         const pwaStatus = document.getElementById('pwaStatus');
         const installInstructions = document.getElementById('installInstructions');
+        const debugInfo = document.getElementById('debugInfo');
+
+        // Afficher les informations de débogage
+        function showDebugInfo(message) {
+            if (debugInfo) {
+                debugInfo.textContent = message;
+                debugInfo.style.display = 'block';
+                console.log('DEBUG:', message);
+            }
+        }
 
         // Vérifier si le navigateur supporte les PWA
         function checkPWACompatibility() {
             const isCompatible = 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
-            console.log('PWA Compatibility:', isCompatible);
+            showDebugInfo(`PWA Compatible: ${isCompatible}`);
             return isCompatible;
         }
 
@@ -1578,32 +1589,33 @@
             if ('serviceWorker' in navigator) {
                 try {
                     const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('SW registered: ', registration);
+                    showDebugInfo('SW enregistré: ' + registration.scope);
                     
                     // Vérifier s'il y a une mise à jour en attente
                     if (registration.waiting) {
-                        console.log('New service worker waiting');
+                        showDebugInfo('Nouveau Service Worker en attente');
                     }
                     
                     // Écouter les mises à jour
                     registration.addEventListener('updatefound', () => {
                         const newWorker = registration.installing;
-                        console.log('New service worker installing');
+                        showDebugInfo('Nouveau Service Worker en installation');
                         
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed') {
-                                console.log('New service worker installed');
+                                showDebugInfo('Nouveau Service Worker installé');
                             }
                         });
                     });
                     
                     return registration;
                 } catch (error) {
-                    console.log('SW registration failed: ', error);
+                    showDebugInfo('Échec enregistrement SW: ' + error.message);
                     showPWAStatus('Service Worker non supporté', 'error');
                     return null;
                 }
             }
+            showDebugInfo('Service Worker non supporté');
             return null;
         }
 
@@ -1611,7 +1623,7 @@
         function checkIfAppIsInstalled() {
             // Méthode 1: display-mode
             if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('App is running in standalone mode');
+                showDebugInfo('Application en mode standalone');
                 showPWAStatus('Application déjà installée', 'success');
                 if (installButton) installButton.style.display = 'none';
                 return true;
@@ -1619,7 +1631,7 @@
             
             // Méthode 2: navigator.standalone (iOS)
             if (window.navigator.standalone === true) {
-                console.log('App is running in iOS standalone mode');
+                showDebugInfo('Application en mode standalone iOS');
                 showPWAStatus('Application déjà installée', 'success');
                 if (installButton) installButton.style.display = 'none';
                 return true;
@@ -1631,7 +1643,7 @@
         // Fonction pour déclencher l'installation
         function installApp() {
             if (!deferredPrompt) {
-                console.log('No deferred prompt available');
+                showDebugInfo('Aucune invite d\'installation disponible');
                 showInstallInstructions();
                 return;
             }
@@ -1642,14 +1654,14 @@
             // Attendre que l'utilisateur réponde à l'invite
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
+                    showDebugInfo('Utilisateur a accepté l\'installation');
                     showPWAStatus('Application installée avec succès!', 'success');
                     // Cacher le bouton d'installation après acceptation
                     if (installButton) {
                         installButton.style.display = 'none';
                     }
                 } else {
-                    console.log('User dismissed the install prompt');
+                    showDebugInfo('Utilisateur a refusé l\'installation');
                     showPWAStatus('Installation annulée', 'error');
                 }
                 
@@ -1662,17 +1674,20 @@
         function showInstallInstructions() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isAndroid = /Android/.test(navigator.userAgent);
+            const isDesktop = !isIOS && !isAndroid;
             
             if (installInstructions) {
                 installInstructions.style.display = 'block';
             }
             
             if (isIOS) {
-                showPWAStatus('Utilisez le menu de partage Safari pour installer', 'loading');
+                showPWAStatus('Utilisez le menu de partage Safari pour installer', 'info');
             } else if (isAndroid) {
-                showPWAStatus('Utilisez le menu Chrome pour installer', 'loading');
+                showPWAStatus('Utilisez le menu Chrome pour installer', 'info');
+            } else if (isDesktop) {
+                showPWAStatus('Recherchez l\'icône d\'installation dans la barre d\'adresse', 'info');
             } else {
-                showPWAStatus('Votre navigateur supporte l\'installation d\'applications', 'loading');
+                showPWAStatus('Votre navigateur supporte l\'installation d\'applications', 'info');
             }
         }
 
@@ -1680,22 +1695,51 @@
         function showPWAStatus(message, type) {
             if (!pwaStatus) return;
             
-            pwaStatus.textContent = message;
+            // Mettre à jour le texte et les classes
+            const icon = pwaStatus.querySelector('i');
+            const text = pwaStatus.querySelector('span');
+            
+            if (text) text.textContent = message;
+            
             pwaStatus.className = 'pwa-status';
             
             if (type === 'success') {
                 pwaStatus.classList.add('pwa-success');
+                if (icon) icon.className = 'fas fa-check-circle';
             } else if (type === 'error') {
                 pwaStatus.classList.add('pwa-error');
+                if (icon) icon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'info') {
+                pwaStatus.classList.add('pwa-info');
+                if (icon) icon.className = 'fas fa-info-circle';
             } else {
                 pwaStatus.classList.add('pwa-loading');
+                if (icon) icon.className = 'fas fa-spinner fa-spin';
             }
             
-            pwaStatus.style.display = 'block';
+            pwaStatus.style.display = 'flex';
+        }
+
+        // Vérifier les critères d'installation PWA
+        function checkPWAInstallCriteria() {
+            // Vérifier que nous sommes en HTTPS
+            const isSecure = window.location.protocol === 'https:';
+            
+            // Vérifier que le service worker est enregistré
+            const hasSW = 'serviceWorker' in navigator;
+            
+            // Vérifier que le manifeste est valide
+            const hasManifest = document.querySelector('link[rel="manifest"]') !== null;
+            
+            showDebugInfo(`Secure: ${isSecure}, SW: ${hasSW}, Manifest: ${hasManifest}`);
+            
+            return isSecure && hasSW && hasManifest;
         }
 
         // Initialiser PWA
         function initializePWA() {
+            showDebugInfo('Initialisation PWA...');
+            
             if (!checkPWACompatibility()) {
                 showPWAStatus('Fonctionnalités PWA non supportées', 'error');
                 return;
@@ -1703,51 +1747,95 @@
             
             showPWAStatus('Vérification de l\'installation...', 'loading');
             
-            // Enregistrer le Service Worker
-            registerServiceWorker();
+            // Vérifier les critères d'installation
+            if (!checkPWAInstallCriteria()) {
+                showPWAStatus('Critères d\'installation PWA non remplis', 'error');
+                return;
+            }
             
-            // Vérifier si l'app est déjà installée
-            if (!checkIfAppIsInstalled()) {
-                // Gérer l'installation de l'application
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    console.log('beforeinstallprompt event fired');
-                    
-                    // Empêcher le mini-infobar d'apparaître sur mobile
-                    e.preventDefault();
-                    
-                    // Stocker l'événement pour qu'il puisse être déclenché plus tard
-                    deferredPrompt = e;
-                    
-                    // Afficher le bouton d'installation
+            // Enregistrer le Service Worker
+            registerServiceWorker().then(() => {
+                // Vérifier si l'app est déjà installée
+                if (!checkIfAppIsInstalled()) {
+                    // Configurer le bouton d'installation
                     if (installButton) {
-                        installButton.style.display = 'block';
                         installButton.addEventListener('click', installApp);
                     }
                     
-                    showPWAStatus('Application prête à être installée', 'success');
-                    console.log('PWA installation available');
-                });
-            }
-
-            window.addEventListener('appinstalled', () => {
-                console.log('App was successfully installed');
-                showPWAStatus('Application installée avec succès!', 'success');
-                
-                // Masquer le bouton d'installation
-                if (installButton) {
-                    installButton.style.display = 'none';
+                    // Vérifier périodiquement si l'événement beforeinstallprompt se déclenche
+                    let checkCount = 0;
+                    const maxChecks = 10;
+                    const checkInterval = setInterval(() => {
+                        checkCount++;
+                        
+                        if (deferredPrompt) {
+                            clearInterval(checkInterval);
+                            showPWAStatus('Application prête à être installée', 'success');
+                            if (installButton) installButton.style.display = 'block';
+                        } else if (checkCount >= maxChecks) {
+                            clearInterval(checkInterval);
+                            showPWAStatus('Fonctionnalité d\'installation non déclenchée', 'info');
+                            showInstallInstructions();
+                        }
+                    }, 1000);
                 }
-                
-                // Réinitialiser deferredPrompt
-                deferredPrompt = null;
             });
         }
+
+        // Gestionnaire d'événement pour beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            showDebugInfo('Événement beforeinstallprompt déclenché');
+            
+            // Empêcher le mini-infobar d'apparaître sur mobile
+            e.preventDefault();
+            
+            // Stocker l'événement pour qu'il puisse être déclenché plus tard
+            deferredPrompt = e;
+            
+            // Afficher le bouton d'installation
+            if (installButton) {
+                installButton.style.display = 'block';
+            }
+            
+            showPWAStatus('Application prête à être installée', 'success');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            showDebugInfo('Application installée avec succès');
+            showPWAStatus('Application installée avec succès!', 'success');
+            
+            // Masquer le bouton d'installation
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+            
+            // Réinitialiser deferredPrompt
+            deferredPrompt = null;
+        });
+
+        // Détecter si l'application a été lancée depuis l'écran d'accueil
+        window.addEventListener('load', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                showDebugInfo('Lancé depuis l\'écran d\'accueil');
+                showPWAStatus('Application installée', 'success');
+            }
+        });
 
         // Initialiser au chargement du document
         document.addEventListener('DOMContentLoaded', function() {
             // Démarrer l'initialisation PWA après un court délai
             setTimeout(initializePWA, 1000);
+            
+            // Définir la date du jour comme valeur par défaut pour les champs de date
+            const today = new Date().toISOString().split('T')[0];
+            if (document.getElementById('operation-date')) {
+                document.getElementById('operation-date').value = today;
+            }
+            if (document.getElementById('correctif-date')) {
+                document.getElementById('correctif-date').value = today;
+            }
         });
     </script>
 </body>
 </html>
+
