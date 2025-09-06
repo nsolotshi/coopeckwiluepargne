@@ -11,12 +11,16 @@
     {
       "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "lang": "fr"
 }
