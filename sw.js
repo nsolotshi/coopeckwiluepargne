@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coopec-kwilu-v4';
+const CACHE_NAME = 'coopec-kwilu-v5';
 const urlsToCache = [
   '/',
   '/index.html',
