@@ -5,7 +5,7 @@
     <link rel="icon" href="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg">
 
-   <!-- Meta tags pour PWA -->
+    <!-- Meta tags pour PWA -->
     <meta name="theme-color" content="#2c3e50">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,7 +14,7 @@
     <meta name="msapplication-TileColor" content="#2c3e50">
     <meta name="application-name" content="Coopec Kwilu">
     <meta name="mobile-web-app-capable" content="yes">
-    
+
     <!-- Lien vers le manifeste -->
     <link rel="manifest" href="/manifest.json">
     <meta charset="UTF-8">
@@ -371,33 +371,80 @@
         #installButton:hover {
             background-color: #219a52;
         }
+
+        /* Styles pour les instructions d'installation */
+        .install-instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .install-instructions h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .install-instructions ul {
+            padding-left: 20px;
+        }
+
+        .install-instructions li {
+            margin-bottom: 8px;
+        }
+
+        /* État de chargement pour PWA */
+        .pwa-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .pwa-loading {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .pwa-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .pwa-error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
     </style>
 </head>
 <body>
     <!-- Ajouter cette modale pour la saisie du mot de passe au début du body -->
-        <div id="password-modal" class="modal" style="display: flex;">
+    <div id="password-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <div class="logo-container">
-            <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" class="logo-image">
-            <h2>Coopec Kwilu - Accès sécurisé</h2>
+                <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" class="logo-image">
+                <h2>Coopec Kwilu - Accès sécurisé</h2>
             </div>
             <div id="password-form">
-            <div class="form-group">
-                <label for="password-input">Mot de passe d'accès:</label>
-                <input type="password" id="password-input" required>
-            </div>
-            <div id="password-message" class="message" style="display: none;"></div>
-            <button class="btn btn-primary" onclick="validatePassword()">Se connecter</button>
+                <div class="form-group">
+                    <label for="password-input">Mot de passe d'accès:</label>
+                    <input type="password" id="password-input" required>
+                </div>
+                <div id="password-message" class="message" style="display: none;"></div>
+                <button class="btn btn-primary" onclick="validatePassword()">Se connecter</button>
             </div>
         </div>
-        </div>
+    </div>
+
     <header>
         <div class="container">
             <div class="logo-container">
                 <img src="https://i.postimg.cc/RNH2v9sC/logo-coopec-Kwilu.jpg" alt="Logo Coopec Kwilu" class="logo-image">
                 <h1>Coopec Kwilu - Gestion Épargne</h1>
             </div>
-            <p class="subtitle">Système de gestion des Dépôts, Retraits et Commandes</p>
+            <p class="subtitle">Système de gestion des dépôts, retraits et commandes</p>
             
             <div class="main-menu">
                 <div class="menu-item" onclick="showPage('encoding')">
@@ -699,6 +746,7 @@
                 <button class="btn btn-warning" onclick="showPage('commands')"><i class="fas fa-arrow-left"></i> Retour aux Commandes</button>
             </div>
         </div>
+
         <!-- Ajouter la nouvelle page pour le changement de date -->
         <div id="changement-date-page" class="page">
             <h2><i class="fas fa-calendar-alt"></i> Changement de date</h2>
@@ -752,10 +800,24 @@
                         <h3>Commandes</h3>
                         <p>Générez les soldes et relevés des membres</p>
                     </div>
-                    <!-- Bouton d'installation  -->
+                    
+                    <!-- Bouton d'installation -->
                     <button id="installButton" class="btn btn-success">
                         <i class="fas fa-download"></i> Installer l'application
                     </button>
+                    
+                    <!-- Instructions d'installation -->
+                    <div id="pwaStatus" class="pwa-status pwa-loading" style="display: none;">
+                        Vérification de l'installation PWA...
+                    </div>
+                    
+                    <div class="install-instructions" id="installInstructions" style="display: none;">
+                        <h3>Comment installer l'application</h3>
+                        <ul>
+                            <li><strong>Sur Chrome Android:</strong> Appuyez sur le menu (⋮) → "Ajouter à l'écran d'accueil"</li>
+                            <li><strong>Sur Safari iOS:</strong> Appuyez sur l'icône de partage (⎗) → "Sur l'écran d'accueil"</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -770,7 +832,7 @@
 
     <script>
         // URL de votre script Google Apps (À REMPLACER par votre URL réelle)
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLqZb3XolwXiKJqAP68Ss1qGcXY1OltOqIOHCEB0lBKo1ZmO1IeWcTnfUpG3yJP6ha/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC7qkX0nvDs09AHzGVc-PHG54vo_L1s0cUr4BVQnZOW0PtcqClipRdayDvDfO1c8wb/exec";
         
         // Variables globales pour stocker les données
         let operations = [];
@@ -1080,6 +1142,7 @@
                 messageDiv.className = 'message error';
             });
         }
+        
         // Fonction pour envoyer les données de changement de date
         function submitChangementDate() {
             const refDebut = document.getElementById('changement-ref-debut').value;
@@ -1368,115 +1431,115 @@
                 messageDiv.className = 'message error';
             });
         }
+        
         // Variables globales pour l'état d'authentification
         let isAuthenticated = false;
         let hasCorrectifAccess = false;
 
         // Fonction pour valider le mot de passe
-        // Fonction pour valider le mot de passe
         function validatePassword() {
-        const password = document.getElementById('password-input').value;
-        const messageDiv = document.getElementById('password-message');
-        
-        if (!password) {
-            messageDiv.textContent = 'Veuillez saisir le mot de passe';
-            messageDiv.className = 'message error';
+            const password = document.getElementById('password-input').value;
+            const messageDiv = document.getElementById('password-message');
+            
+            if (!password) {
+                messageDiv.textContent = 'Veuillez saisir le mot de passe';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            messageDiv.textContent = 'Vérification du mot de passe...';
+            messageDiv.className = 'message';
             messageDiv.style.display = 'block';
-            return;
-        }
-        
-        messageDiv.textContent = 'Vérification du mot de passe...';
-        messageDiv.className = 'message';
-        messageDiv.style.display = 'block';
-        
-        // Préparer les données à envoyer
-        const data = {
-            action: "validate_password",
-            password: password
-        };
+            
+            // Préparer les données à envoyer
+            const data = {
+                action: "validate_password",
+                password: password
+            };
 
-        const formData = new URLSearchParams();
-        for (const key in data) {
-            formData.append(key, data[key]);
-        }
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
 
-        // Envoyer la requête au serveur
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            body: formData,
-            headers: { "Content-Type": "application/x-www-form-urlencoded" }
-        })
-        .then(response => {
-            if (!response.ok) {
-            throw new Error('Erreur réseau');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === "success") {
-            isAuthenticated = true;
-            hasCorrectifAccess = data.hasCorrectifAccess || false;
-            document.getElementById('password-modal').style.display = 'none';
-            showPage('home');
-            } else {
-            // Afficher le message retourné par le serveur
-            messageDiv.textContent = data.message;
-            messageDiv.className = 'message error';
-            }
-        })
-        .catch(err => {
-            messageDiv.textContent = "Erreur de connexion au serveur";
-            messageDiv.className = 'message error';
-            console.error("Erreur détaillée:", err);
-        });
+            // Envoyer la requête au serveur
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    isAuthenticated = true;
+                    hasCorrectifAccess = data.hasCorrectifAccess || false;
+                    document.getElementById('password-modal').style.display = 'none';
+                    showPage('home');
+                } else {
+                    // Afficher le message retourné par le serveur
+                    messageDiv.textContent = data.message;
+                    messageDiv.className = 'message error';
+                }
+            })
+            .catch(err => {
+                messageDiv.textContent = "Erreur de connexion au serveur";
+                messageDiv.className = 'message error';
+                console.error("Erreur détaillée:", err);
+            });
         }
 
         // Modifier la fonction showSubCommand pour vérifier l'accès aux fonctionnalités sensibles
         function showSubCommand(commandId) {
-        // Vérifier l'accès pour les fonctionnalités sensibles
-        if ((commandId === 'correctif' || commandId === 'changement-date') && !hasCorrectifAccess) {
-            alert('Accès non autorisé. Mot de passe correctif requis.');
-            return;
-        }
-        
-        showPage(commandId);
+            // Vérifier l'accès pour les fonctionnalités sensibles
+            if ((commandId === 'correctif' || commandId === 'changement-date') && !hasCorrectifAccess) {
+                alert('Accès non autorisé. Mot de passe correctif requis.');
+                return;
+            }
+            
+            showPage(commandId);
         }
 
         // Fonction pour demander l'accès correctif
         function requestCorrectifAccess() {
-        const password = prompt('Veuillez saisir le mot de passe correctif:');
-        
-        if (!password) return;
-        
-        // Préparer les données à envoyer
-        const data = {
-            action: "validate_correctif_password",
-            password: password
-        };
+            const password = prompt('Veuillez saisir le mot de passe correctif:');
+            
+            if (!password) return;
+            
+            // Préparer les données à envoyer
+            const data = {
+                action: "validate_correctif_password",
+                password: password
+            };
 
-        const formData = new URLSearchParams();
-        for (const key in data) {
-            formData.append(key, data[key]);
-        }
-
-        // Envoyer la requête au serveur
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            body: formData,
-            headers: { "Content-Type": "application/x-www-form-urlencoded" }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "success") {
-            hasCorrectifAccess = true;
-            alert('Accès correctif autorisé.');
-            } else {
-            alert('Mot de passe incorrect.');
+            const formData = new URLSearchParams();
+            for (const key in data) {
+                formData.append(key, data[key]);
             }
-        })
-        .catch(err => {
-            alert("Erreur de connexion: " + err.message);
-        });
+
+            // Envoyer la requête au serveur
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: formData,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    hasCorrectifAccess = true;
+                    alert('Accès correctif autorisé.');
+                } else {
+                    alert('Mot de passe incorrect.');
+                }
+            })
+            .catch(err => {
+                alert("Erreur de connexion: " + err.message);
+            });
         }
 
         // Initialisation
@@ -1495,191 +1558,196 @@
         });
         
     </script>
+
+    <!-- ==================== GESTION PWA AMÉLIORÉE ==================== -->
     <script>
-    // ==================== GESTION PWA AMÉLIORÉE ====================
-    let deferredPrompt;
-    const installButton = document.getElementById('installButton');
-    
-    // Vérifier si l'application peut être installée
-    function checkPWAInstallable() {
-      // Vérifier si l'application est déjà installée
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('App est déjà installée');
-        if (installButton) installButton.style.display = 'none';
-        return;
-      }
-      
-      // Vérifier si le navigateur supporte l'installation PWA
-      if (!deferredPrompt && installButton) {
-        installButton.style.display = 'none';
-      }
-    }
-    
-    // Enregistrement du Service Worker
-    async function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        try {
-          const registration = await navigator.serviceWorker.register('/sw.js');
-          console.log('SW enregistré avec succès: ', registration.scope);
-          
-          // Vérifier s'il y a une mise à jour en attente
-          if (registration.waiting) {
-            console.log('New service worker waiting');
-            // Vous pourriez afficher un message à l'utilisateur ici
-          }
-          
-          // Écouter les mises à jour
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            console.log('New service worker installing');
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+        const pwaStatus = document.getElementById('pwaStatus');
+        const installInstructions = document.getElementById('installInstructions');
+
+        // Vérifier si le navigateur supporte les PWA
+        function checkPWACompatibility() {
+            const isCompatible = 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
+            console.log('PWA Compatibility:', isCompatible);
+            return isCompatible;
+        }
+
+        // Enregistrement du Service Worker
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('SW registered: ', registration);
+                    
+                    // Vérifier s'il y a une mise à jour en attente
+                    if (registration.waiting) {
+                        console.log('New service worker waiting');
+                    }
+                    
+                    // Écouter les mises à jour
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('New service worker installing');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed') {
+                                console.log('New service worker installed');
+                            }
+                        });
+                    });
+                    
+                    return registration;
+                } catch (error) {
+                    console.log('SW registration failed: ', error);
+                    showPWAStatus('Service Worker non supporté', 'error');
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // Vérifier si l'app est déjà installée
+        function checkIfAppIsInstalled() {
+            // Méthode 1: display-mode
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('App is running in standalone mode');
+                showPWAStatus('Application déjà installée', 'success');
+                if (installButton) installButton.style.display = 'none';
+                return true;
+            }
             
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed') {
-                console.log('New service worker installed');
-                // Vous pourriez afficher un message à l'utilisateur ici
-              }
+            // Méthode 2: navigator.standalone (iOS)
+            if (window.navigator.standalone === true) {
+                console.log('App is running in iOS standalone mode');
+                showPWAStatus('Application déjà installée', 'success');
+                if (installButton) installButton.style.display = 'none';
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Fonction pour déclencher l'installation
+        function installApp() {
+            if (!deferredPrompt) {
+                console.log('No deferred prompt available');
+                showInstallInstructions();
+                return;
+            }
+            
+            // Afficher l'invite d'installation
+            deferredPrompt.prompt();
+            
+            // Attendre que l'utilisateur réponde à l'invite
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    showPWAStatus('Application installée avec succès!', 'success');
+                    // Cacher le bouton d'installation après acceptation
+                    if (installButton) {
+                        installButton.style.display = 'none';
+                    }
+                } else {
+                    console.log('User dismissed the install prompt');
+                    showPWAStatus('Installation annulée', 'error');
+                }
+                
+                // Réinitialiser deferredPrompt
+                deferredPrompt = null;
             });
-          });
-          
-          return registration;
-        } catch (error) {
-          console.error('SW registration failed: ', error);
-          return null;
         }
-      }
-      return null;
-    }
-    
-    // Vérifier si l'app est déjà installée
-    function checkIfAppIsInstalled() {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('App is running in standalone mode');
-        if (installButton) {
-          installButton.style.display = 'none';
+
+        // Fonction pour afficher les instructions d'installation manuelle
+        function showInstallInstructions() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            if (installInstructions) {
+                installInstructions.style.display = 'block';
+            }
+            
+            if (isIOS) {
+                showPWAStatus('Utilisez le menu de partage Safari pour installer', 'loading');
+            } else if (isAndroid) {
+                showPWAStatus('Utilisez le menu Chrome pour installer', 'loading');
+            } else {
+                showPWAStatus('Votre navigateur supporte l\'installation d\'applications', 'loading');
+            }
         }
-        return true;
-      }
-      
-      // Vérification pour iOS
-      if (window.navigator.standalone === true) {
-        console.log('App is running in iOS standalone mode');
-        if (installButton) {
-          installButton.style.display = 'none';
+
+        // Afficher le statut PWA
+        function showPWAStatus(message, type) {
+            if (!pwaStatus) return;
+            
+            pwaStatus.textContent = message;
+            pwaStatus.className = 'pwa-status';
+            
+            if (type === 'success') {
+                pwaStatus.classList.add('pwa-success');
+            } else if (type === 'error') {
+                pwaStatus.classList.add('pwa-error');
+            } else {
+                pwaStatus.classList.add('pwa-loading');
+            }
+            
+            pwaStatus.style.display = 'block';
         }
-        return true;
-      }
-      
-      return false;
-    }
-    
-    // Fonction pour déclencher l'installation
-    function installApp() {
-      if (!deferredPrompt) {
-        console.log('No deferred prompt available');
-        showInstallInstructions();
-        return;
-      }
-      
-      // Afficher l'invite d'installation
-      deferredPrompt.prompt();
-      
-      // Attendre que l'utilisateur réponde à l'invite
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-          // Cacher le bouton d'installation après acceptation
-          if (installButton) {
-            installButton.style.display = 'none';
-          }
-        } else {
-          console.log('User dismissed the install prompt');
+
+        // Initialiser PWA
+        function initializePWA() {
+            if (!checkPWACompatibility()) {
+                showPWAStatus('Fonctionnalités PWA non supportées', 'error');
+                return;
+            }
+            
+            showPWAStatus('Vérification de l\'installation...', 'loading');
+            
+            // Enregistrer le Service Worker
+            registerServiceWorker();
+            
+            // Vérifier si l'app est déjà installée
+            if (!checkIfAppIsInstalled()) {
+                // Gérer l'installation de l'application
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    console.log('beforeinstallprompt event fired');
+                    
+                    // Empêcher le mini-infobar d'apparaître sur mobile
+                    e.preventDefault();
+                    
+                    // Stocker l'événement pour qu'il puisse être déclenché plus tard
+                    deferredPrompt = e;
+                    
+                    // Afficher le bouton d'installation
+                    if (installButton) {
+                        installButton.style.display = 'block';
+                        installButton.addEventListener('click', installApp);
+                    }
+                    
+                    showPWAStatus('Application prête à être installée', 'success');
+                    console.log('PWA installation available');
+                });
+            }
+
+            window.addEventListener('appinstalled', () => {
+                console.log('App was successfully installed');
+                showPWAStatus('Application installée avec succès!', 'success');
+                
+                // Masquer le bouton d'installation
+                if (installButton) {
+                    installButton.style.display = 'none';
+                }
+                
+                // Réinitialiser deferredPrompt
+                deferredPrompt = null;
+            });
         }
-        
-        // Réinitialiser deferredPrompt
-        deferredPrompt = null;
-      });
-    }
-    
-    // Fonction pour afficher les instructions d'installation manuelle
-    function showInstallInstructions() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isAndroid = /Android/.test(navigator.userAgent);
-      
-      if (isIOS) {
-        alert("Pour installer cette application sur iOS:\n\n1. Ouvrez Safari\n2. Appuyez sur le bouton de partage (⎗)\n3. Faites défiler vers le bas et sélectionnez 'Sur l'écran d'accueil'\n4. Appuyez sur 'Ajouter'");
-      } else if (isAndroid) {
-        alert("Pour installer cette application sur Android:\n\n1. Ouvrez le menu du navigateur (⋮)\n2. Sélectionnez 'Installer l'application' ou 'Ajouter à l'écran d'accueil'\n3. Confirmez l'installation");
-      } else {
-        alert("Pour installer cette application:\n\nAndroid: Ouvrez le menu du navigateur (⋮) et sélectionnez 'Installer l'application' ou 'Ajouter à l'écran d'accueil'\n\niOS: Utilisez le bouton de partage (⎗) et sélectionnez 'Sur l'écran d'accueil'");
-      }
-    }
-    
-    // Initialiser PWA
-    function initializePWA() {
-      if (!checkPWACompatibility()) {
-        console.log('PWA features not supported in this browser');
-        return;
-      }
-      
-      // Enregistrer le Service Worker
-      registerServiceWorker();
-      
-      // Vérifier si l'app est déjà installée
-      checkIfAppIsInstalled();
-      
-      // Gérer l'installation de l'application
-      const installButton = document.getElementById('installButton');
-      
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired');
-        
-        // Empêcher le mini-infobar d'apparaître sur mobile
-        e.preventDefault();
-        
-        // Stocker l'événement pour qu'il puisse être déclenché plus tard
-        deferredPrompt = e;
-        
-        // Afficher le bouton d'installation
-        if (installButton) {
-          installButton.style.display = 'block';
-          installButton.addEventListener('click', installApp);
-        }
-        
-        console.log('PWA installation available');
-      });
-    
-      window.addEventListener('appinstalled', () => {
-        console.log('App was successfully installed');
-        
-        // Masquer le bouton d'installation
-        if (installButton) {
-          installButton.style.display = 'none';
-        }
-        
-        // Réinitialiser deferredPrompt
-        deferredPrompt = null;
-      });
-    }
-    
-    // Vérifier la compatibilité PWA
-    function checkPWACompatibility() {
-      return ('serviceWorker' in navigator) && ('BeforeInstallPromptEvent' in window);
-    }
-    
-    // Initialiser au chargement du document
-    document.addEventListener('DOMContentLoaded', function() {
-      initializePWA();
-    });
+
+        // Initialiser au chargement du document
+        document.addEventListener('DOMContentLoaded', function() {
+            // Démarrer l'initialisation PWA après un court délai
+            setTimeout(initializePWA, 1000);
+        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
